@@ -15,6 +15,8 @@ app.use(express.json());
 
 app.use("/videos", videosRoute);
 
+app.use("/images", express.static("./public/images"));
+
 app.listen(8080, () => {
     console.log("Listening on port 8080");
 });

@@ -1,7 +1,10 @@
 const fs = require("fs");
 const express = require("express");
-
+const { v4: uuidv4 } = require("uuid");
 const router = express.Router();
+
+const videoDataJSON = fs.readFileSync("./data/video-details.json");
+let videoData = JSON.parse(videoDataJSON);
 
 router.get("/", (req, res) => {
     const videoDataJSON = fs.readFileSync("./data/video-details.json");
@@ -33,3 +36,23 @@ router.get("/:id", (req, res) => {
 });
 
 module.exports = router;
+
+router.post("/", (req, res) => {
+    const { image, title, description } = req.body;
+    console.log(image, title, description);
+    const newVideo = {
+        id: uuidv4(),
+        title,
+        description,
+        image,
+        likes: 0,
+        views: 0,
+        channel: "Anonymous",
+        timestamp: Date.now(),
+        comments: [],
+    };
+    // console.log(newVideo);
+    videoData.push(newVideo);
+    fs.writeFileSync("./data/video-details.json", JSON.stringify(videoData));
+    res.json(videoData);
+});

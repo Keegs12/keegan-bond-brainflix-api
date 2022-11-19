@@ -6,6 +6,7 @@ const router = express.Router();
 const videoDataJSON = fs.readFileSync("./data/video-details.json");
 let videoData = JSON.parse(videoDataJSON);
 
+//get data
 router.get("/", (req, res) => {
     const videoDataJSON = fs.readFileSync("./data/video-details.json");
     let videoData = JSON.parse(videoDataJSON);
@@ -22,6 +23,7 @@ router.get("/", (req, res) => {
     res.json(filteredData);
 });
 
+//Get video url id
 router.get("/:id", (req, res) => {
     const id = req.params.id;
     const videoDataJSON = fs.readFileSync("./data/video-details.json");
@@ -37,14 +39,15 @@ router.get("/:id", (req, res) => {
 
 module.exports = router;
 
+//Video Upload
 router.post("/", (req, res) => {
-    const { image, title, description } = req.body;
-    console.log(image, title, description);
+    const { title, description } = req.body;
+    console.log(title, description);
     const newVideo = {
         id: uuidv4(),
         title,
         description,
-        image,
+        image: "http://localhost:8080/images/uploadVideo.jpg",
         likes: 0,
         views: 0,
         channel: "Anonymous",
@@ -53,6 +56,25 @@ router.post("/", (req, res) => {
     };
     // console.log(newVideo);
     videoData.push(newVideo);
+    fs.writeFileSync("./data/video-details.json", JSON.stringify(videoData));
+    res.json(videoData);
+});
+
+router.post("/:id/comments", (req, res) => {
+    const id = req.params.id;
+    const video = videoData.find((video) => video.id === id);
+    const { comment } = req.body;
+    console.log(comment);
+    const commentArray = video.comments;
+    console.log(commentArray);
+    const newComment = {
+        id: uuidv4(),
+        name: "Anonymous",
+        comment: comment,
+        likes: 0,
+        timestamp: Date.now(),
+    };
+    commentArray.push(newComment);
     fs.writeFileSync("./data/video-details.json", JSON.stringify(videoData));
     res.json(videoData);
 });

@@ -60,13 +60,17 @@ router.post("/", (req, res) => {
     res.json(videoData);
 });
 
+//Post a Comment
 router.post("/:id/comments", (req, res) => {
-    const id = req.params.id;
-    const video = videoData.find((video) => video.id === id);
-    const { comment } = req.body;
-    console.log(comment);
-    const commentArray = video.comments;
-    console.log(commentArray);
+    const id = req.params.id; //get video id hence the params
+
+    const video = videoData.find((video) => video.id === id); //find the specific video
+
+    const { comment } = req.body; //take the "posted comment" from the "body"
+
+    const commentArray = video.comments; //get the array of comments from the specific video
+
+    //create new comment object
     const newComment = {
         id: uuidv4(),
         name: "Anonymous",
@@ -74,7 +78,33 @@ router.post("/:id/comments", (req, res) => {
         likes: 0,
         timestamp: Date.now(),
     };
-    commentArray.push(newComment);
-    fs.writeFileSync("./data/video-details.json", JSON.stringify(videoData));
-    res.json(videoData);
+
+    commentArray.push(newComment); //push new comment to the array of comments
+
+    fs.writeFileSync("./data/video-details.json", JSON.stringify(videoData)); //write back the new data
+
+    res.json(videoData); //respond
+});
+
+//Delete a comment
+router.delete("/:id/comments/:commentId", (req, res) => {
+    const videoId = req.params.id; //get videoId from url hence params
+
+    const commentId = req.params.commentId; //get commentId from url hence params
+
+    const video = videoData.find((video) => {
+        return video.id === videoId;
+    }); //find the specific video
+
+    const videoComments = video.comments; //get the specific video comments
+
+    const removeComment = videoComments.findIndex(
+        (comment) => comment.id === commentId
+    ); //find the Index of the comment we wish to remove, this will let us use splice as splice takes the index of the item we wish to remove
+
+    videoComments.splice(removeComment, 1); //remove comment
+
+    fs.writeFileSync("./data/video-details.json", JSON.stringify(videoData)); //write back the new data
+
+    res.json(videoData); //respond
 });

@@ -8,9 +8,13 @@ let videoData = JSON.parse(videoDataJSON);
 
 //get data
 router.get("/", (req, res) => {
-    const videoDataJSON = fs.readFileSync("./data/video-details.json");
-    let videoData = JSON.parse(videoDataJSON);
+    const videoDataJSON = fs.readFileSync("./data/video-details.json"); //read data
+
+    let videoData = JSON.parse(videoDataJSON); //parse data into an object
+
     const filteredData = [];
+
+    //push necessary data for the next videos section
     for (let i = 0; i < videoData.length; i++) {
         filteredData.push({
             id: videoData[i].id,
@@ -20,21 +24,25 @@ router.get("/", (req, res) => {
         });
     }
 
-    res.json(filteredData);
+    res.json(filteredData); //resopond
 });
 
 //Get video url id
 router.get("/:id", (req, res) => {
-    const id = req.params.id;
-    const videoDataJSON = fs.readFileSync("./data/video-details.json");
-    let videoData = JSON.parse(videoDataJSON);
-    const video = videoData.find((video) => video.id === id);
+    const id = req.params.id; //get id from url
+
+    const videoDataJSON = fs.readFileSync("./data/video-details.json"); //read the data
+
+    let videoData = JSON.parse(videoDataJSON); //convert data to object
+
+    const video = videoData.find((video) => video.id === id); //find specific video
 
     if (video === undefined) {
+        //if video is undefined send this error
         return res.status(404).send(`Video ${id} does not exist`);
     }
 
-    res.json(video);
+    res.json(video); //respond
 });
 
 module.exports = router;

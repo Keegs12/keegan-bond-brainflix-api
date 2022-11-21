@@ -41,8 +41,9 @@ module.exports = router;
 
 //Video Upload
 router.post("/", (req, res) => {
-    const { title, description } = req.body;
-    console.log(title, description);
+    const { title, description } = req.body; //grab title and description out of request.body, I sent this via my front end
+
+    //create new video, set a lot of default values considering my form only has 2 inputs
     const newVideo = {
         id: uuidv4(),
         title,
@@ -54,9 +55,14 @@ router.post("/", (req, res) => {
         timestamp: Date.now(),
         comments: [],
     };
-    // console.log(newVideo);
+
+    //push new data into existing data file
     videoData.push(newVideo);
+
+    //write new data
     fs.writeFileSync("./data/video-details.json", JSON.stringify(videoData));
+
+    //respond
     res.json(videoData);
 });
 
@@ -103,6 +109,27 @@ router.delete("/:id/comments/:commentId", (req, res) => {
     ); //find the Index of the comment we wish to remove, this will let us use splice as splice takes the index of the item we wish to remove
 
     videoComments.splice(removeComment, 1); //remove comment
+
+    fs.writeFileSync("./data/video-details.json", JSON.stringify(videoData)); //write back the new data
+
+    res.json(videoData); //respond
+});
+
+router.put("/:id/likes", (req, res) => {
+    const videoId = req.params.id; //get videoId from url hence params
+
+    //find the specific video
+    const video = videoData.find((video) => {
+        return video.id === videoId;
+    });
+
+    let likes = video.likes.split(",").join(""); //split likes by comma and join back as a string
+
+    let incLikes = parseInt(likes) + 1; //change string into an integer then increment(add 1)
+
+    let stringLikes = incLikes.toLocaleString(); //now change the incremented number back into a string, we can use toLocaleString to get the comma's back which is very convenient
+
+    video.likes = stringLikes; //set the videolikes to the newly incremented likes
 
     fs.writeFileSync("./data/video-details.json", JSON.stringify(videoData)); //write back the new data
 
